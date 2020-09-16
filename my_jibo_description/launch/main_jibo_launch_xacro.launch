@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <include file="$(find my_jibo_description)/launch/spawn_jibo_xacro.launch">
+        <arg name="x" value="0.5" />
+        <arg name="y" value="0.0" />
+        <arg name="z" value="0.18" />
+        <arg name="robot_name" value="jibo" />
+    </include>
+    <include file="$(find my_jibo_description)/launch/jibo_control.launch"/>
+</launch>

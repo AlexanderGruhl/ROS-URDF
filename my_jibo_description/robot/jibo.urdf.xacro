@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="jibo">
+
+
+ <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/jibo</robotNamespace>
+        </plugin>
+    </gazebo>
+
+<!-- MACROS -->
+<xacro:property name="m" value="0.01" />
+<xacro:property name="leg_length" value="0.06" />
+
+<xacro:macro name="default_origin">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+</xacro:macro>
+
+<!--Colours-->
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+    <material name="red">
+        <color rgba="0.8 0 0 1"/>
+    </material>
+    <material name="green">
+        <color rgba="0 0.8 0 1"/>
+    </material>
+    <material name="grey">
+        <color rgba="0.75 0.75 0.75 1"/>
+    </material>
+
+    <!-- * * * Link Definitions * * * -->
+    <!--Base and head links and joint-->
+    <link name="dummy_link">
+        <visual>
+            <origin rpy="0.0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.01 0.01 0.01" />
+            </geometry>
+
+            <material name="grey"/>
+        </visual>
+    </link>
+    
+    <link name="head_link">  
+         <inertial>
+            <xacro:default_origin />
+            <mass value="0.75" />
+            <inertia ixx="3.015625e-05" ixy="0.0" ixz="0.0" iyy="3.015625e-05" iyz="0.0" izz="3.125e-07"/>
+        </inertial>
+        <collision>
+            <xacro:default_origin />
+            <geometry>
+                <sphere radius="0.11"/>
+            </geometry>
+        </collision>
+        <visual>
+            <xacro:default_origin />
+            <geometry>
+                <mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_head_v5.dae"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="dummy_head_joint" type="fixed">
+    	<parent link="dummy_link"/>
+    	<child link="head_link"/>
+        <origin xyz="0 0.0095 0.06" rpy="0 -0 3.14159"/>
+	</joint>
+
+     <link name="body_link">  
+         <inertial>
+            <xacro:default_origin />
+            <mass value="1" />
+            <inertia ixx="3.005625e-05" ixy="0.0" ixz="0.0" iyy="3.005625e-05" iyz="0.0" izz="1.125e-07"/>
+        </inertial>
+        <collision>
+            <xacro:default_origin />
+            <geometry>
+                <cylinder length="0.175" radius="0.09"/>
+            </geometry>
+        </collision>
+        <visual>
+            <xacro:default_origin />
+            <geometry>
+                <mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_body_v3.dae"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="head_body_joint" type="fixed">
+    	<parent link="head_link"/>
+    	<child link="body_link"/>
+        <origin xyz="0 0.0095 0.06" rpy="0 -0 3.14159"/>
+	</joint>
+
+    <link name="waist_link">  
+         <inertial>
+            <xacro:default_origin />
+            <mass value="0.5" />
+            <inertia ixx="3.005625e-05" ixy="0.0" ixz="0.0" iyy="3.005625e-05" iyz="0.0" izz="1.125e-07"/>
+        </inertial>
+        <collision>
+            <xacro:default_origin />
+            <geometry>
+                <cylinder length="0.75" radius="0.09"/>
+            </geometry>
+        </collision>
+        <visual>
+            <xacro:default_origin />
+            <geometry>
+                <mesh filename="package://my_jibo_description/models/jibo/meshes/jibo_final_parts_head_v5.dae"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="body_waist_joint" type="fixed">
+    	<parent link="body_link"/>
+    	<child link="waist_link"/>
+        <origin xyz="0 0.0095 0.06" rpy="0 -0 3.14159"/>
+	</joint>
+
+    <link name="base_link">  
+        <inertial>
+            <xacro:default_origin />
+            <mass value="0.1" />
+            <inertia ixx="2.56e-07" ixy="0.0" ixz="0.0" iyy="2.56e-07" iyz="0.0" izz="2.56e-07"/>
+        </inertial>
+        <collision>
+            <xacro:default_origin />
+            <geometry>
+                <sphere radius="0.008"/>
+            </geometry>
+        </collision>
+        <visual>
+            <xacro:default_origin />
+            <geometry>
+                <sphere radius="0.008"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="waist_base_joint" type="continuous">
+    	<parent link="waist_link"/>
+    	<child link="base_link"/>
+        <origin xyz="0 0.0095 0.06" rpy="0 0 0"/>
+        <limit lower="-1.6" upper="0.0" effort="1.0" velocity="0.005"/>
+        <axis xyz="0 0 1"/>
+	</joint>
+
+    <transmission name="waist_base_tran">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="waist_base_joint">
+            <hardwareInterface>EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="waist_base_motor">
+            <hardwareInterface>EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+
+ </robot>   
